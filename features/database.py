@@ -224,3 +224,72 @@ def update_profile_website_info(name: str, website: list[dict], district: str):
 		print(f"Error updating profile info: {e}")
 		myConnection.rollback()
 		return None
+
+def update_proportion_website_info(name: str, website: list[dict], block: str):
+	try:
+		cursor = myConnection.cursor(pymysql.cursors.DictCursor)
+
+		if not name or not block:
+			return None
+		
+		# Find all records with the same district
+		sql = """
+			SELECT p.id, p.kanji_name, p.hiragana_name
+			FROM representatives2026 p
+			WHERE p.proportional = %s AND p.kanji_name IS NOT NULL
+		"""
+		cursor.execute(sql, (block,))
+		candidates = cursor.fetchall()
+		
+		if not candidates:
+			print(f"No candidates found for district: {block}")
+			return None
+		
+		# Find the best match using longest common subsequence
+		best_match = None
+		best_match_id = None
+		max_lcs_length = 0
+		
+		for candidate in candidates:
+			kanji_name = candidate.get('kanji_name', '')
+			hiragana_name = candidate.get('hiragana_name', '')
+			if not kanji_name:
+				continue
+			
+			# Calculate LCS length
+			lcs_length_kanji = longest_common_subsequence(name, kanji_name)
+			lcs_length_hiragana = longest_common_subsequence(name, hiragana_name)
+			
+			# Update best match if this has a longer LCS
+			if lcs_length_kanji > max_lcs_length or lcs_length_hiragana > max_lcs_length:
+				max_lcs_length = max(lcs_length_kanji, lcs_length_hiragana)
+				best_match = kanji_name if lcs_length_kanji > lcs_length_hiragana else hiragana_name
+				best_match_id = candidate.get('id')
+		
+		if not best_match_id or max_lcs_length == 0:
+			print(f"No matching candidate found for name: {name} in district: {block}")
+			print(f"Available candidates: {[c.get('kanji_name') for c in candidates]}")
+			return None
+		else:
+			pass # print(f"Name: {name} Best match: {best_match} id: {best_match_id}")
+		
+		# Convert website list to JSON string for storage in longtext field
+		website_json = json.dumps(website, ensure_ascii=False) if website else None
+		
+		# Update the matched record with website
+		update_sql = """
+			UPDATE representatives2026
+			SET website = %s
+			WHERE id = %s
+		"""
+		cursor.execute(update_sql, (website_json, best_match_id))
+		myConnection.commit()
+
+		cursor.close()
+		
+		return best_match_id
+		
+	except Exception as e:
+		print(f"Error updating profile info: {e}")
+		myConnection.rollback()
+		return None
