@@ -12,14 +12,13 @@ def main():
 	blocks = ['北海道', '東北', '北関東', '南関東', '東京', '北陸信越', '東海', '近畿', '中国', '四国', '九州']
 	
 	try:
-		for i in range(151, 152):
+		for i in range(151, 162):
 			url = f"{SENKYO_PROPORTION_BASE_URL}/{i}/hirei_party/4/candidates"
 			driver.get(url)
 		
 			links = extract_senkyo_proportion_nav_links(driver)
 
 			for j, link in enumerate(links, 1):
-				
 				if link:
 					driver.get(link)
 					candidates_data = extract_senkyo_table_candidates(driver)
