@@ -4,6 +4,7 @@ from features.extractors.nikkei_profile import NikkeiProfileExtractor
 from features.extractors.senkyo_candidate import SenkyoCandidateTableExtractor
 from features.extractors.senkyo_navigation import SenkyoDistrictNavigationExtractor
 from features.extractors.senkyo_sitelinks import SenkyoProfileSiteLinksExtractor
+from features.extractors.senkyo_proportion_navigation import SenkyoProportionNavigationExtractor
 
 __all__ = [
 	'NikkieCandidateExtractor',
@@ -12,4 +13,5 @@ __all__ = [
 	'SenkyoCandidateTableExtractor',
 	'SenkyoDistrictNavigationExtractor',
 	'SenkyoProfileSiteLinksExtractor',
+	'SenkyoProportionNavigationExtractor',
 ]

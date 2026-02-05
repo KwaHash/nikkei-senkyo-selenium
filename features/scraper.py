@@ -5,8 +5,13 @@ from features.extractors import (
 	SenkyoCandidateTableExtractor,
 	SenkyoDistrictNavigationExtractor,
 	SenkyoProfileSiteLinksExtractor,
+	SenkyoProportionNavigationExtractor,
 )
 from features.config import DEFAULT_WAIT_TIME
+
+def extract_senkyo_proportion_nav_links(driver, wait_time=DEFAULT_WAIT_TIME):
+	extractor = SenkyoProportionNavigationExtractor(wait_time=wait_time)
+	return extractor.extract(driver)
 
 def extract_senkyo_district_nav_links(driver, wait_time=DEFAULT_WAIT_TIME):
 	extractor = SenkyoDistrictNavigationExtractor(wait_time=wait_time)

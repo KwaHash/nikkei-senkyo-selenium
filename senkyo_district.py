@@ -4,7 +4,7 @@ from features.scraper import (
 	extract_senkyo_table_candidates,
 	extract_senkyo_profile_info
 )
-from features.config import SENKYO_SITE_BASE_URL
+from features.config import SENKYO_DISTRICT_BASE_URL
 from features.database import update_profile_website_info
 
 def main():
@@ -12,7 +12,7 @@ def main():
 	
 	try:
 		for i in range(1, 48):
-			url = f"{SENKYO_SITE_BASE_URL}/{i}"
+			url = f"{SENKYO_DISTRICT_BASE_URL}/{i}"
 			driver.get(url)
 		
 			links = extract_senkyo_district_nav_links(driver)

@@ -19,7 +19,8 @@ PARTIES = [
 ]
 
 NIKKEI_SITE_BASE_URL = "https://www.nikkei.com/special/election/candidates"
-SENKYO_SITE_BASE_URL = "https://go2senkyo.com/shugiin/28030/prefecture"
+SENKYO_DISTRICT_BASE_URL = "https://go2senkyo.com/shugiin/28030/prefecture"
+SENKYO_PROPORTION_BASE_URL = "https://go2senkyo.com/shugiin/28030/hireiku"
 AVATARS_DIR = "avatars"
 DEFAULT_WAIT_TIME = 1
 
