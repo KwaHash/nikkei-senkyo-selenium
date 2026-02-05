@@ -1,0 +1,8 @@
+selenium
+webdriver-manager
+beautifulsoup4
+lxml
+python-dotenv
+pyinstaller
+mysql-connector-python
+pymysql
