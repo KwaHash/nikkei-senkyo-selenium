@@ -1,7 +1,7 @@
 import pymysql
 import json
-from typing import Dict, Optional
-from features.config import DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+from typing import Optional
+from features.config import DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, QUESTION_ANSWER_REPLACEMENTS
 from features.utils import longest_common_subsequence
 
 myConnection = pymysql.connect(
@@ -293,3 +293,47 @@ def update_proportion_website_info(name: str, website: list[dict], block: str):
 		print(f"Error updating profile info: {e}")
 		myConnection.rollback()
 		return None
+
+def update_candidate_question():
+	import json
+	try:
+		# Build old -> new lookup for quick replacement
+		replacement = {p['old']: p['new'] for p in QUESTION_ANSWER_REPLACEMENTS}
+		cursor = myConnection.cursor()
+		cursor.execute(
+			"SELECT id, questions_answers FROM representatives2026 WHERE questions_answers IS NOT NULL AND questions_answers != ''"
+		)
+		rows = cursor.fetchall()
+		updated_rows = 0
+		for row_id, qa_json in rows:
+			if not qa_json:
+				continue
+			try:
+				items = json.loads(qa_json) if isinstance(qa_json, str) else qa_json
+			except (TypeError, json.JSONDecodeError):
+				continue
+			changed = False
+			for item in items:
+				if not isinstance(item, dict):
+					continue
+				q = item.get('question')
+				a = item.get('answer')
+				if q and q in replacement:
+					item['question'] = replacement[q]
+					changed = True
+				if a and a in replacement:
+					item['answer'] = replacement[a]
+					changed = True
+			if changed:
+				new_json = json.dumps(items, ensure_ascii=False)
+				cursor.execute(
+					"UPDATE representatives2026 SET questions_answers = %s WHERE id = %s",
+					(new_json, row_id)
+				)
+				updated_rows += cursor.rowcount
+		myConnection.commit()
+		cursor.close()
+		print(f"questions_answers: updated {updated_rows} row(s) in representatives2026.")
+	except Exception as e:
+		print(f"Error updating questions_answers: {e}")
+		myConnection.rollback()
