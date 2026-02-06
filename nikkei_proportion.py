@@ -5,7 +5,7 @@ from features.database import insert_proportion_profile_info
 
 def main():
 	driver = create_driver(headless=True)
-	blocks = ['北海道', '東北', '北関東', '東京', '南関東', '北陸信越', '東海', '近畿', '中国', '四国', '九州']
+	blocks = ['北海道', '東北', '北関東', '南関東', '東京', '北陸信越', '東海', '近畿', '中国', '四国', '九州']
 	
 	try:
 		for i in range(1, 12):
