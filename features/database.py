@@ -339,25 +339,25 @@ def update_candidate_question():
 
 def update_result_pref(profile_info, is_elected, vote_count):
 	kanji_name = profile_info.get('kanji_name') or ""
-	party = profile_info.get('party') or None
+	district = profile_info.get('district') or None
 	shu_count = profile_info.get('shu_count') or 0
 
 	cursor = myConnection.cursor(pymysql.cursors.DictCursor)
 
-	if not kanji_name or not party:
+	if not kanji_name or not district:
 		return None
 	
 	# Find all records with the same district
 	sql = """
 		SELECT p.id
 		FROM representatives2026 p
-		WHERE p.kanji_name = %s AND p.party = %s
+		WHERE p.district = %s AND p.kanji_name = %s
 	"""
-	cursor.execute(sql, (kanji_name, party))
+	cursor.execute(sql, (district, kanji_name))
 	row = cursor.fetchone()
 	if not row:
 		cursor.close()
-		print(f"No candidates found for name: {kanji_name} and party: {party}")
+		print(f"No candidates found for district: {district}")
 		return None
 
 	id_val = row["id"]
@@ -367,6 +367,39 @@ def update_result_pref(profile_info, is_elected, vote_count):
 		WHERE id = %s
 	"""
 	cursor.execute(update_sql, (shu_count, is_elected, vote_count, id_val))
+	myConnection.commit()
+	cursor.close()
+	return id_val
+
+def update_result_hirei(profile_info, block, is_elected):
+	kanji_name = profile_info.get('kanji_name') or ""
+	shu_count = profile_info.get('shu_count') or 0
+
+	cursor = myConnection.cursor(pymysql.cursors.DictCursor)
+
+	if not kanji_name:
+		return None
+	
+	# Find all records with the same district
+	sql = """
+		SELECT p.id
+		FROM representatives2026 p
+		WHERE p.proportional = %s AND p.kanji_name = %s
+	"""
+	cursor.execute(sql, (block, kanji_name))
+	row = cursor.fetchone()
+	if not row:
+		cursor.close()
+		print(f"No candidates found for proportional: {block}")
+		return None
+
+	id_val = row["id"]
+	update_sql = """
+		UPDATE representatives2026
+		SET shu_count = %s, vote_result = %s
+		WHERE id = %s
+	"""
+	cursor.execute(update_sql, (shu_count, is_elected, id_val))
 	myConnection.commit()
 	cursor.close()
 	return id_val

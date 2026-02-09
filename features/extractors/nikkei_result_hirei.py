@@ -28,7 +28,7 @@ class NikkieResultHireiExtractor:
 				continue
 			link = self._get_profile_link_from_tr(link_tr)
 			if link:
-				elected.append({"link": link, "vote_count": 0, "is_elected": 2 if is_elected else 0})
+				elected.append({"link": link, "is_elected": 2 if is_elected else 0})
 		return elected
 
 	def _has_tou(self, data_tr):
