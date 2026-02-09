@@ -155,7 +155,6 @@ def insert_proportion_profile_info(profile_info, rank: str, block: str) -> Optio
 		myConnection.rollback()
 		return None
 
-
 def update_profile_website_info(name: str, website: list[dict], district: str):
 	try:
 		cursor = myConnection.cursor(pymysql.cursors.DictCursor)
@@ -337,3 +336,37 @@ def update_candidate_question():
 	except Exception as e:
 		print(f"Error updating questions_answers: {e}")
 		myConnection.rollback()
+
+def update_result_pref(profile_info, is_elected, vote_count):
+	kanji_name = profile_info.get('kanji_name') or ""
+	district = profile_info.get('district') or None
+	shu_count = profile_info.get('shu_count') or 0
+
+	cursor = myConnection.cursor(pymysql.cursors.DictCursor)
+
+	if not kanji_name or not district:
+		return None
+	
+	# Find all records with the same district
+	sql = """
+		SELECT p.id
+		FROM representatives2026 p
+		WHERE p.district = %s AND p.kanji_name = %s
+	"""
+	cursor.execute(sql, (district, kanji_name))
+	row = cursor.fetchone()
+	if not row:
+		cursor.close()
+		print(f"No candidates found for district: {district}")
+		return None
+
+	id_val = row["id"]
+	update_sql = """
+		UPDATE representatives2026
+		SET shu_count = %s, vote_result = %s, vote_count = %s
+		WHERE id = %s
+	"""
+	cursor.execute(update_sql, (shu_count, is_elected, vote_count, id_val))
+	myConnection.commit()
+	cursor.close()
+	return id_val
