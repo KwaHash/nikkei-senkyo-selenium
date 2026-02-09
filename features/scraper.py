@@ -3,6 +3,7 @@ from features.extractors import (
 	NikkieProportionCandidateExtractor,
 	NikkeiProfileExtractor,
 	NikkieResultPrefExtractor,
+	NikkieResultHireiExtractor,
 	SenkyoCandidateTableExtractor,
 	SenkyoDistrictNavigationExtractor,
 	SenkyoProfileSiteLinksExtractor,
@@ -36,6 +37,10 @@ def extract_nikkie_proportion_candidate_links(driver, wait_time=DEFAULT_WAIT_TIM
 
 def extract_nikkie_result_pref(driver, wait_time=DEFAULT_WAIT_TIME):
 	extractor = NikkieResultPrefExtractor(wait_time=wait_time)
+	return extractor.extract(driver)
+
+def extract_nikkie_result_hirei(driver, wait_time=DEFAULT_WAIT_TIME):
+	extractor = NikkieResultHireiExtractor(wait_time=wait_time)
 	return extractor.extract(driver)
 
 def extract_profile_info(driver, href: str, wait_time=DEFAULT_WAIT_TIME):
