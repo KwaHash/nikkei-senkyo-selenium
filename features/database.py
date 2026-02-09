@@ -339,25 +339,25 @@ def update_candidate_question():
 
 def update_result_pref(profile_info, is_elected, vote_count):
 	kanji_name = profile_info.get('kanji_name') or ""
-	district = profile_info.get('district') or None
+	party = profile_info.get('party') or None
 	shu_count = profile_info.get('shu_count') or 0
 
 	cursor = myConnection.cursor(pymysql.cursors.DictCursor)
 
-	if not kanji_name or not district:
+	if not kanji_name or not party:
 		return None
 	
 	# Find all records with the same district
 	sql = """
 		SELECT p.id
 		FROM representatives2026 p
-		WHERE p.district = %s AND p.kanji_name = %s
+		WHERE p.kanji_name = %s AND p.party = %s
 	"""
-	cursor.execute(sql, (district, kanji_name))
+	cursor.execute(sql, (kanji_name, party))
 	row = cursor.fetchone()
 	if not row:
 		cursor.close()
-		print(f"No candidates found for district: {district}")
+		print(f"No candidates found for name: {kanji_name} and party: {party}")
 		return None
 
 	id_val = row["id"]
